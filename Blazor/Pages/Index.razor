@@ -1,0 +1,76 @@
+﻿@page "/"
+
+@inject IJSRuntime JSRuntime
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+
+<div class="col-6 align-self-center" style="margin: auto; text-align: center;">
+    <div class="rz-p-sm-12 rz-text-align-center">
+        <RadzenLabel Text="Select date format:" />
+        <RadzenDropDown @bind-Value=@dateFormatDropdown Data=@dateFormatTypes Style="width: 100%; max-width: 400px;" />
+    </div>
+    <div class="rz-p-sm-6 rz-text-align-center">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select file</RadzenText>
+            <RadzenUpload Url="upload/single" Icon="upload" ChooseText="">
+                <RadzenUploadHeader Name="Date-Format" Value="@dateFormatDropdown" />
+            </RadzenUpload>
+        </RadzenCard>
+    </div>
+    <div class="row" style="margin-top: 1rem;">
+        <RadzenLabel Text="*End dates are included in calculations (1 day is added)" />
+    </div>
+    <div class="row" style="margin-top: 1rem;">
+        <RadzenDataGrid @ref="employeeDataGrid" Data="@employeeData" TItem="EmployeesProjectOverlap" EmptyText="" style="height: 350px; overflow: auto;">
+            <Columns>
+                <RadzenDataGridColumn TItem="EmployeesProjectOverlap" Property="EmployeeOneId" Title="Employee ID #1" Width="25%" />
+                <RadzenDataGridColumn TItem="EmployeesProjectOverlap" Property="EmployeeTwoId" Title="Employee ID #2" Width="25%" />
+                <RadzenDataGridColumn TItem="EmployeesProjectOverlap" Property="ProjectId" Title="Project ID" Width="25%" />
+                <RadzenDataGridColumn TItem="EmployeesProjectOverlap" Property="DaysWorkedTogether" Title="Days Worked" Width="25%" />
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+</div>
+
+
+@code {
+    private Timer _timer;
+
+    HubConnection hubConnection;
+    List<EmployeesProjectOverlap> employeeData { get; set; } = new List<EmployeesProjectOverlap>();
+    RadzenDataGrid<EmployeesProjectOverlap> employeeDataGrid;
+    string dateFormatDropdown = "yyyy-MM-dd";
+    List<string> dateFormatTypes = new List<string>() { "yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/parserhub"))
+            .Build();
+
+        hubConnection.On<string>("UploadError", (data) =>
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = data, Duration = 2500 });
+        });
+
+        hubConnection.On<List<EmployeesProjectOverlap>>("ReceiveUpload", async (data) =>
+        {
+            await JSRuntime.InvokeVoidAsync("console.log", data);
+            _ = InvokeAsync(async () =>
+                {
+                    await RefreshGrid(data);
+                });
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task RefreshGrid(List<EmployeesProjectOverlap> data)
+    {
+        employeeData = data;
+        StateHasChanged();
+        await employeeDataGrid.Reload();
+    }
+}

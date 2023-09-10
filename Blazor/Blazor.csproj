@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="test-inputs\test10.csv" />
+    <None Remove="test-inputs\test11-empty-csv.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="test-inputs\test0-wrong-file-type.txt" />
+    <Content Include="test-inputs\test1-basic-overlap.csv" />
+    <Content Include="test-inputs\test11-empty-csv.csv" />
+    <Content Include="test-inputs\test2-no-overlap.csv" />
+    <Content Include="test-inputs\test3.csv" />
+    <Content Include="test-inputs\test4.csv" />
+    <Content Include="test-inputs\test5.csv" />
+    <Content Include="test-inputs\test10.csv" />
+    <Content Include="test-inputs\test6.csv" />
+    <Content Include="test-inputs\test7-yyyy-MM-dd.csv" />
+    <Content Include="test-inputs\test8-dd-MM-yyyy.csv" />
+    <Content Include="test-inputs\test9-MM-dd-yyyy.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.10" />
+    <PackageReference Include="NLog" Version="5.2.4" />
+    <PackageReference Include="Radzen.Blazor" Version="4.15.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
+</Project>
