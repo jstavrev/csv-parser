@@ -34,11 +34,9 @@
 
 
 @code {
-    private Timer _timer;
-
     HubConnection hubConnection;
-    List<EmployeesProjectOverlap> employeeData { get; set; } = new List<EmployeesProjectOverlap>();
     RadzenDataGrid<EmployeesProjectOverlap> employeeDataGrid;
+    List<EmployeesProjectOverlap> employeeData { get; set; } = new List<EmployeesProjectOverlap>();
     string dateFormatDropdown = "yyyy-MM-dd";
     List<string> dateFormatTypes = new List<string>() { "yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy" };
 
@@ -46,6 +44,7 @@
     {
         await base.OnInitializedAsync();
 
+        //Configure SignalR hub
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/parserhub"))
             .Build();
