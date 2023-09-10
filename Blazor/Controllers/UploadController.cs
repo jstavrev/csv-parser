@@ -112,7 +112,7 @@ namespace Blazor.Controllers
             }
             catch (Exception ex)
             {
-                await _parserHubContext.Clients.All.SendAsync("UploadError", "Server error.");
+                await _parserHubContext.Clients.All.SendAsync("UploadError", "Server error. Detailed log is available in the logs folder.");
                 logger.Error($"{DateTime.UtcNow} | UploadSingle failed: {ex}. Message: {ex.Message}");
                 return StatusCode(500, ex.Message);
             }
